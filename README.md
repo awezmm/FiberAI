@@ -13,12 +13,16 @@ Install 2020A MATLAB Runtime Driver
 
 ## How to Use:
 
-### Use resizer.py to resize/slice your images to sizes of 1024 x 1024. 
+Use resizer.py to resize/slice your images to sizes of 1024 x 1024. 
 
 Run resizer.py with path of image or folder of input images, and output directory.  
   
-### Use main.py to run model inference and find and measure fibers. This also will produce an output.mat file. 
+
+
+Use main.py to run model inference and find and measure fibers. This also will produce an output.mat file. 
 
 Run main.py with path of image or folder of input images, and output directory.  
-  
-### Run Fibermainmenu.mlapp to launch MATLAB interface, and select output.mat file.
+
+
+
+Run Fibermainmenu.mlapp to launch MATLAB interface, and select output.mat file.
