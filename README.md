@@ -4,8 +4,11 @@
 More in-depth instructions to be provided soon.
 
 Requirements:
+
 Run pip install -r requirements.txt
+
 Install detectron2 from here https://github.com/facebookresearch/detectron2/blob/master/INSTALL.md
+
 Install 2020A MATLAB Runtime Driver
 
 
