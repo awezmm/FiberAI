@@ -3,7 +3,7 @@
 
 More in-depth instructions to be provided soon.
 
-Requirements:
+## Requirements:
 
 Run pip install -r requirements.txt
 
@@ -11,7 +11,7 @@ Install detectron2 from here https://github.com/facebookresearch/detectron2/blob
 
 Install 2020A MATLAB Runtime Driver
 
-How to Use:
+## How to Use:
 
 Use resizer.py to resize/slice your images to sizes of 1024 x 1024. 
 Run resizer.py with: python resizer.py <path of image or folder> <"f" for folder or "i" for image> <path of output directory>
