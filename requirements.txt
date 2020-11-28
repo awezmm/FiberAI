@@ -1,0 +1,8 @@
+opencv-python
+pathlib
+tqdm
+numpy
+matplotlib
+torch
+scikit-image
+argparse
