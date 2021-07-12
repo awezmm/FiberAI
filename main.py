@@ -1,4 +1,5 @@
 print("Importing Modules")
+import os
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
@@ -20,6 +21,10 @@ import scipy.io
 from skimage import exposure
 import argparse
 import glob
+
+
+script_path = ""
+
 
 def imshow(img):
 	cv2.imshow("w", img) 
@@ -232,16 +237,7 @@ def closeColoredGaps(img, thinnedMask, objectsPattern, objectsLengths, objectsIn
 
 
 
-					
-
-
-
-
-		
-
-
-
-
+				
 
 
 
@@ -277,14 +273,16 @@ def preprocess(img, z_STANDARD = 0.95):
 	return result.copy()
 
 
-def buildPredictor(model_path = "model_final.pth", threshold = 0.5):
+def buildPredictor(model_path = "model_final.pth", threshold = 0.5, num_class = 4):
+
+	model_full_path = script_path + model_path
 	cfg = get_cfg()
 
 	cfg.merge_from_file(model_zoo.get_config_file("COCO-InstanceSegmentation/mask_rcnn_R_50_FPN_3x.yaml"))
-	cfg.MODEL.WEIGHTS = model_path
+	cfg.MODEL.WEIGHTS = model_full_path
 	cfg.MODEL.ROI_HEADS.SCORE_THRESH_TEST = threshold
 	cfg.MODEL.DEVICE = "cpu"
-	cfg.MODEL.ROI_HEADS.NUM_CLASSES = 1
+	cfg.MODEL.ROI_HEADS.NUM_CLASSES = num_class
 	predictor = DefaultPredictor(cfg)
 	return predictor
 
@@ -443,7 +441,6 @@ def getMeasurements(img, outputs, imgNum):
 def main_analyze(img_paths, output_folder):
 
 	
-	img_paths = ["/Users/aazamzia/Desktop/fiberstuff/splitted/01-1.tif", "/Users/aazamzia/Desktop/fiberstuff/splitted/01-1.tif"]
 
 
 	print("Building Predictor")
@@ -452,7 +449,7 @@ def main_analyze(img_paths, output_folder):
 
 	print("Analyzing Images")
 
-	output_directory = "/Users/aazamzia/impy/figures/"
+	output_directory = output_folder
 	os.chdir(output_directory)
 
 
@@ -479,13 +476,20 @@ def main_analyze(img_paths, output_folder):
 			resized_img = cv2.resize(orig_img, (1024, 1024))
 
 
-		preprocessed_img = preprocess(resized_img)
+		preprocessed_img = resized_img.copy()
 		cv2.imwrite("finalpreprocess.png", preprocessed_img)
 		cv2.imwrite("original.png", resized_img)
 		
 		
 
 		outputs = predictor(preprocessed_img)
+		instances = outputs['instances']
+
+		filtered_instances = instances[instances.pred_classes == 2]
+		outputs = {"instances": filtered_instances}
+	
+
+	
 
 		if not os.path.isdir("Image"+str(i+1)):
 			os.mkdir("Image"+str(i+1))
@@ -493,6 +497,9 @@ def main_analyze(img_paths, output_folder):
 		currCSVData, currboundingBoxes = getMeasurements(preprocessed_img, outputs, i+1)
 
 		currCSVData.pop(0)
+
+		allCSVData.extend(currCSVData)
+		
 		currCSVData = np.array(currCSVData)
 		currFiberLengths = currCSVData[:,[2,3]]
 		allFiberLengths.append(currFiberLengths)
@@ -505,12 +512,15 @@ def main_analyze(img_paths, output_folder):
 		writer = csv.writer(file)
 		writer.writerows(allCSVData)
 
-	print(allFiberLengths)
+	#print(allFiberLengths)
 	scipy.io.savemat('outputs.mat', {"imgPaths": img_paths, "fiberLengths": allFiberLengths,  "boundingBoxes": allBoundingboxes})
 	
 
 
 if __name__ == "__main__":
+
+	script_path = os.path.dirname(os.path.realpath(__file__)) + "/"
+
 	parser = argparse.ArgumentParser()
 	parser.add_argument("-image", "-image", default=".")
 	parser.add_argument("-folder", "-folder", default=".")
